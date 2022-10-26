@@ -40,6 +40,8 @@ jobs:
         echo ${{ env.IMAGE_NAME }}
         
   build:
+    if: |
+      github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
      - name: Git Checkout
@@ -65,20 +67,24 @@ jobs:
 
 
 
-#   deploy:
-#     runs-on: ubuntu-latest
-#     needs: build
-#     steps:
-#       - name: SSH
-#         id: ssh_docker
-#         uses: appleboy/ssh-action@v0.1.5
-#         with:
-#           host: ${{ env.SIT_IP }}
-#           username: ${{ env.SIT_USER }}
-#           key: ${{ secrets.DEVVM_PRIVATE_KEY }}
-#           script: |
-#             TELE_SUCCESS_MSG="[GithubActions] Auth Microservice has been deployed onto aws through docker. >ssh -i <PrivKey.pem> ubuntu@${{ env.SIT_IP }}"
-#             echo SUCCESS MSG: ${TELE_SUCCESS_MSG}
+  deploy:
+    if: |
+      github.event_name == 'pull_request' && 
+      github.event.action == 'closed' &&
+      github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: SSH
+        id: ssh_docker
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ env.SIT_IP }}
+          username: ${{ env.SIT_USER }}
+          key: ${{ secrets.DEVVM_PRIVATE_KEY }}
+          script: |
+            TELE_SUCCESS_MSG="[GithubActions] Auth Microservice has been deployed onto aws through docker. >ssh -i <PrivKey.pem> ubuntu@${{ env.SIT_IP }}"
+            echo SUCCESS MSG: ${TELE_SUCCESS_MSG}
 #             sudo docker login -u ${{ env.DOCKER_USERNAME }} -p ${{ env.DOCKER_PAT }}
 #             sudo docker pull ${{ env.IMAGE_NAME }}
 #             sudo docker ps --filter name=${{ env.CONTAINER_NAME }} | awk '{print $1}' | grep -v CONTAINER && sudo docker stop $(sudo docker ps --filter name=${{ env.CONTAINER_NAME }} | awk '{print $1}' | grep -v CONTAINER)
