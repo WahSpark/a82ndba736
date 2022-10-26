@@ -22,9 +22,9 @@ env:
   IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/spark-lean:${{ inputs.microservice_docker_tag }}
   CONTAINER_NAME: ${{ inputs.container_name }}
   DOCKER_PORT: ${{ inputs.server_port }}
-  SIT_IP: ${{ secrets.SIT_IP }}
+  SIT_IP: 52.221.213.98
   SIT_USER: ec2-user
-  WEBCONFIG_IP: ${{ secrets.WEBCONFIG_IP }}
+  WEBCONFIG_IP: 52.221.213.98
 jobs:
   reusable_workflow_job:
     runs-on: ubuntu-latest
