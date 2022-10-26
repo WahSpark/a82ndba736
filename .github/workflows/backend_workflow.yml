@@ -1,0 +1,18 @@
+on:
+  workflow_call:
+    inputs:
+      server-port:
+        required: true
+        type: string
+      webconfig-url:
+        required: true
+        type: string
+jobs:
+  reusable_workflow_job:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - name: abcd
+      run: |
+        echo "hi there"
+        
