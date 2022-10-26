@@ -33,8 +33,8 @@ jobs:
     - name: abcd
       run: |
         echo "hi there"
-        echo "${{ inputs.server-port }}"
-        echo ${{ inputs.webconfig-url }}
+        echo "${{ env.DOCKER_PORT }}"
+        echo ${{ env.SIT_IP }}
         echo ${{ env.JASYPT_PW }}
         echo ${{ env.DOCKER_USERNAME }}
         echo ${{ env.IMAGE_NAME }}
