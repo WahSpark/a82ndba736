@@ -17,4 +17,7 @@ jobs:
     - name: abcd
       run: |
         echo "hi there"
+        echo "${{ inputs.server-port }}"
+        echo ${{ inputs.webconfig-url }}
+        echo ${{ secrets.DOCKER_PAT }}
         
