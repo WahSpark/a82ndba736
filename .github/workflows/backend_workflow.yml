@@ -19,5 +19,5 @@ jobs:
         echo "hi there"
         echo "${{ inputs.server-port }}"
         echo ${{ inputs.webconfig-url }}
-        echo ${{ secrets.DOCKER_PAT }}
+        echo ${{ secrets.DaaaOCKER_PAT }}
         
