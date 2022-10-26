@@ -20,7 +20,7 @@ env:
   DOCKER_USERNAME: raphaelchia
   DOCKER_PAT: ${{ secrets.DOCKER_PAT }}
   IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/spark-lean:${{ inputs.microservice_docker_tag }}
-  CONTAINER_NAME: authmicroservicecontainer
+  CONTAINER_NAME: ${{ inputs.container_name }}
   DOCKER_PORT: ${{ inputs.server_port }}
   SIT_IP: 52.221.213.98
   SIT_USER: ec2-user
