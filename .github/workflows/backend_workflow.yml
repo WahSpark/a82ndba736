@@ -26,18 +26,6 @@ env:
   SIT_USER: ec2-user
   WEBCONFIG_IP: 52.221.213.98
 jobs:
-  reusable_workflow_job:
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-    - name: Verifying
-      run: |
-        echo "hi there"
-        echo "${{ env.DOCKER_PORT }}"
-        echo ${{ env.SIT_IP }}
-        echo ${{ env.JASYPT_PW }}
-        echo ${{ env.DOCKER_USERNAME }}
-        echo ${{ env.IMAGE_NAME }}
   test:
     if: |
       github.event_name == 'pull_request' &&
