@@ -93,7 +93,7 @@ jobs:
           username: ${{ env.SIT_USER }}
           key: ${{ secrets.DEVVM_PRIVATE_KEY }}
           script: |
-            TELE_SUCCESS_MSG="[GithubActions] Auth Microservice has been deployed onto aws through docker. >ssh -i <PrivKey.pem> ubuntu@${{ env.SIT_IP }}"
+            TELE_SUCCESS_MSG="[GithubActions] ${{ env.CONTAINER_NAME }} has been deployed onto aws through docker. >ssh -i <PrivKey.pem> ${{ env.SIT_USER }}@${{ env.SIT_IP }}"
             echo SUCCESS MSG: ${TELE_SUCCESS_MSG}
             sudo docker login -u ${{ env.DOCKER_USERNAME }} -p ${{ env.DOCKER_PAT }}
             sudo docker pull ${{ env.IMAGE_NAME }}
