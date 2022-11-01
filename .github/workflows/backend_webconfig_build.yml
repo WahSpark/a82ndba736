@@ -1,0 +1,128 @@
+name: Backend Webconfig Build
+
+on:
+  workflow_call:
+    inputs:
+      server_port:
+        required: true
+        type: string
+      webconfig_url:
+        required: false
+        type: string
+      microservice_docker_tag: 
+        required: true
+        type: string
+      container_name:
+        required: true
+        type: string
+env:
+  JASYPT_PW: ${{ secrets.JASYPT_PW }}
+  DOCKER_USERNAME: raphaelchia
+  DOCKER_PAT: ${{ secrets.DOCKER_PAT }}
+  IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/spark-lean:${{ inputs.microservice_docker_tag }}
+  CONTAINER_NAME: ${{ inputs.container_name }}
+  DOCKER_PORT: ${{ inputs.server_port }}
+  POSTGRES_USERNAME: ${{ secrets.POSTGRES_USERNAME }}
+  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+  SIT_IP: 52.221.213.98
+  SIT_USER: ec2-user
+  WEBCONFIG_IP: 52.221.213.98
+jobs:
+  test:
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.action == 'opened'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Git Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v2
+      with:
+        java-version: '17'
+        distribution: 'adopt'
+
+    - name: Build with Maven
+      run: |
+        mvn -DJASYPT_PW=$JASYPT_PW \
+        -DSERVER_PORT=${{ env.DOCKER_PORT }} \
+        -DWEBCONFIG_IP=${{ env.WEBCONFIG_IP }} \
+        -DPOSTGRES_USERNAME=${{ env.POSTGRES_USERNAME }} \
+        -DPOSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }} clean install # need to pass in the argument here during the build to ensure it works
+
+    - name: Building docker image
+      run: |
+        DOCKER_BUILDKIT=1 docker build -t ${{ env.IMAGE_NAME }} . \
+        --build-arg JASYPT_PW=$JASYPT_PW \
+        --build-arg SERVER_PORT=${{ env.DOCKER_PORT }} \
+        --build-arg WEBCONFIG_IP=${{ env.WEBCONFIG_IP }} \
+        --build-arg POSTGRES_USERNAME=${{ env.POSTGRES_USERNAME }}\
+        --build-arg POSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }}
+  
+  build:
+    if: |
+      github.event_name == 'pull_request' && 
+      github.event.action == 'closed' &&
+      github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+     - name: Git Checkout
+       uses: actions/checkout@v2
+
+     - name: Set up JDK 17
+       uses: actions/setup-java@v2
+       with:
+         java-version: '17'
+         distribution: 'adopt'
+
+     - name: Build with Maven
+      run: |
+        mvn -DJASYPT_PW=$JASYPT_PW \
+        -DSERVER_PORT=${{ env.DOCKER_PORT }} \
+        -DWEBCONFIG_IP=${{ env.WEBCONFIG_IP }} \
+        -DPOSTGRES_USERNAME=${{ env.POSTGRES_USERNAME }} \
+        -DPOSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }} clean install # need to pass in the argument here during the build to ensure it works
+        
+     - name: Building docker image
+      run: |
+        DOCKER_BUILDKIT=1 docker build -t ${{ env.IMAGE_NAME }} . \
+        --build-arg JASYPT_PW=$JASYPT_PW \
+        --build-arg SERVER_PORT=${{ env.DOCKER_PORT }} \
+        --build-arg WEBCONFIG_IP=${{ env.WEBCONFIG_IP }} \
+        --build-arg POSTGRES_USERNAME=${{ env.POSTGRES_USERNAME }}\
+        --build-arg POSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }}
+        
+     - name: Docker login
+       run: docker login -u $DOCKER_USERNAME -p $DOCKER_PAT 
+
+     - name: Docker push
+       run: docker push $IMAGE_NAME
+
+
+
+  deploy:
+    if: |
+      github.event_name == 'pull_request' && 
+      github.event.action == 'closed' &&
+      github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: SSH
+        id: ssh_docker
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ env.SIT_IP }}
+          username: ${{ env.SIT_USER }}
+          key: ${{ secrets.DEVVM_PRIVATE_KEY }}
+          script: |
+            TELE_SUCCESS_MSG="[GithubActions] ${{ env.CONTAINER_NAME }} has been deployed onto aws through docker. >ssh -i <PrivKey.pem> ${{ env.SIT_USER }}@${{ env.SIT_IP }}"
+            echo SUCCESS MSG: ${TELE_SUCCESS_MSG}
+            sudo docker login -u ${{ env.DOCKER_USERNAME }} -p ${{ env.DOCKER_PAT }}
+            sudo docker pull ${{ env.IMAGE_NAME }}
+            sudo docker ps --filter name=${{ env.CONTAINER_NAME }} | awk '{print $1}' | grep -v CONTAINER && sudo docker stop $(sudo docker ps --filter name=${{ env.CONTAINER_NAME }} | awk '{print $1}' | grep -v CONTAINER)
+            sudo docker container ls -a | grep ${{ env.CONTAINER_NAME }} | awk '{print $1}' | grep -v CONTAINER && sudo docker rm $(sudo docker container ls -a | grep ${{ env.CONTAINER_NAME }} | awk '{print $1}' | grep -v CONTAINER)
+            sudo docker run -d -p ${{ env.DOCKER_PORT }}:${{ env.DOCKER_PORT }} --name ${{ env.CONTAINER_NAME }} ${{ env.IMAGE_NAME }}
+            sudo docker logout
+            sudo docker ps --filter name=${{ env.CONTAINER_NAME }} && curl -X POST -H 'Content-Type: application/json' -d '{"chat_id": "-581532942", "text": "'"$TELE_SUCCESS_MSG"'", "disable_notification": true}' https://api.telegram.org/bot1815383460:AAHfQmatpaYPj2_XcGddiLj2TbgYViMV01g/sendMessage
