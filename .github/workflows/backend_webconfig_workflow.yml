@@ -45,19 +45,19 @@ jobs:
 
     - name: Build with Maven
       run: >
-        mvn -DJASYPT_PW=$JASYPT_PW \
-        -DSERVER_PORT=${{ env.DOCKER_PORT }} \
-        -DWEBCONFIG_IP=${{ env.WEBCONFIG_IP }} \
-        -DPOSTGRES_USERNAME=${{ env.POSTGRES_USERNAME }} \
+        mvn -DJASYPT_PW=$JASYPT_PW 
+        -DSERVER_PORT=${{ env.DOCKER_PORT }} 
+        -DWEBCONFIG_IP=${{ env.WEBCONFIG_IP }} 
+        -DPOSTGRES_USERNAME=${{ env.POSTGRES_USERNAME }} 
         -DPOSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }} clean install # need to pass in the argument here during the build to ensure it works
 
     - name: Building docker image
       run: >
-        DOCKER_BUILDKIT=1 docker build -t ${{ env.IMAGE_NAME }} . \
-        --build-arg JASYPT_PW=$JASYPT_PW \
-        --build-arg SERVER_PORT=${{ env.DOCKER_PORT }} \
-        --build-arg WEBCONFIG_IP=${{ env.WEBCONFIG_IP }} \
-        --build-arg POSTGRES_USERNAME=${{ env.POSTGRES_USERNAME }}\
+        DOCKER_BUILDKIT=1 docker build -t ${{ env.IMAGE_NAME }} . 
+        --build-arg JASYPT_PW=$JASYPT_PW 
+        --build-arg SERVER_PORT=${{ env.DOCKER_PORT }} 
+        --build-arg WEBCONFIG_IP=${{ env.WEBCONFIG_IP }} 
+        --build-arg POSTGRES_USERNAME=${{ env.POSTGRES_USERNAME }}
         --build-arg POSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }}
   
   build:
@@ -78,19 +78,19 @@ jobs:
 
     - name: Build with Maven
       run: >
-        mvn -DJASYPT_PW=$JASYPT_PW \
-        -DSERVER_PORT=${{ env.DOCKER_PORT }} \
-        -DWEBCONFIG_IP=${{ env.WEBCONFIG_IP }} \
-        -DPOSTGRES_USERNAME=${{ env.POSTGRES_USERNAME }} \
+        mvn -DJASYPT_PW=$JASYPT_PW 
+        -DSERVER_PORT=${{ env.DOCKER_PORT }} 
+        -DWEBCONFIG_IP=${{ env.WEBCONFIG_IP }} 
+        -DPOSTGRES_USERNAME=${{ env.POSTGRES_USERNAME }} 
         -DPOSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }} clean install # need to pass in the argument here during the build to ensure it works
 
     - name: Building docker image
       run: >
-        DOCKER_BUILDKIT=1 docker build -t ${{ env.IMAGE_NAME }} . \
-        --build-arg JASYPT_PW=$JASYPT_PW \
-        --build-arg SERVER_PORT=${{ env.DOCKER_PORT }} \
-        --build-arg WEBCONFIG_IP=${{ env.WEBCONFIG_IP }} \
-        --build-arg POSTGRES_USERNAME=${{ env.POSTGRES_USERNAME }}\
+        DOCKER_BUILDKIT=1 docker build -t ${{ env.IMAGE_NAME }} . 
+        --build-arg JASYPT_PW=$JASYPT_PW 
+        --build-arg SERVER_PORT=${{ env.DOCKER_PORT }} 
+        --build-arg WEBCONFIG_IP=${{ env.WEBCONFIG_IP }} 
+        --build-arg POSTGRES_USERNAME=${{ env.POSTGRES_USERNAME }}
         --build-arg POSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }}
         
     - name: Docker login
