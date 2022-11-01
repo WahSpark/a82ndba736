@@ -44,7 +44,7 @@ jobs:
         distribution: 'adopt'
 
     - name: Build with Maven
-      run: |
+      run: >
         mvn -DJASYPT_PW=$JASYPT_PW \
         -DSERVER_PORT=${{ env.DOCKER_PORT }} \
         -DWEBCONFIG_IP=${{ env.WEBCONFIG_IP }} \
@@ -52,7 +52,7 @@ jobs:
         -DPOSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }} clean install # need to pass in the argument here during the build to ensure it works
 
     - name: Building docker image
-      run: |
+      run: >
         DOCKER_BUILDKIT=1 docker build -t ${{ env.IMAGE_NAME }} . \
         --build-arg JASYPT_PW=$JASYPT_PW \
         --build-arg SERVER_PORT=${{ env.DOCKER_PORT }} \
