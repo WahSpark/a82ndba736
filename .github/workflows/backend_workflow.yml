@@ -80,11 +80,12 @@ jobs:
 
     - name: Build with Maven
       run: >
-        mvn -DJASYPT_PW=$JASYPT_PW 
-        -DSERVER_PORT=${{ env.DOCKER_PORT }} 
-        -DWEBCONFIG_IP=${{ env.WEBCONFIG_IP }} 
-        -DAWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-        -DAWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} clean install # need to pass in the argument here during the build to ensure it works
+        mvn clean package
+#         mvn -DJASYPT_PW=$JASYPT_PW 
+#         -DSERVER_PORT=${{ env.DOCKER_PORT }} 
+#         -DWEBCONFIG_IP=${{ env.WEBCONFIG_IP }} 
+#         -DAWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+#         -DAWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} clean install # need to pass in the argument here during the build to ensure it works
 
     - name: Building docker image
       run: >
@@ -126,7 +127,7 @@ jobs:
             sudo docker pull ${{ env.IMAGE_NAME }}
             sudo docker ps --filter name=${{ env.CONTAINER_NAME }} | awk '{print $1}' | grep -v CONTAINER && sudo docker stop $(sudo docker ps --filter name=${{ env.CONTAINER_NAME }} | awk '{print $1}' | grep -v CONTAINER)
             sudo docker container ls -a | grep ${{ env.CONTAINER_NAME }} | awk '{print $1}' | grep -v CONTAINER && sudo docker rm $(sudo docker container ls -a | grep ${{ env.CONTAINER_NAME }} | awk '{print $1}' | grep -v CONTAINER)
-            sudo docker run -d -p ${{ env.DOCKER_PORT }}:${{ env.DOCKER_PORT }} --name ${{ env.CONTAINER_NAME }} \
+            sudo docker run -d -p ${{ env.DOCKER_PORT }}:${{ env.DOCKER_PORT }} --name ${{ env.CONTAINER_NAME }} \\
               -e JASYPT_PW=${{ env.JASYPT_PW }} \\
               -e SERVER_PORT=${{ env.DOCKER_PORT }} \\
               -e WEBCONFIG_IP=${{ env.WEBCONFIG_IP }} \\
