@@ -127,11 +127,11 @@ jobs:
             sudo docker ps --filter name=${{ env.CONTAINER_NAME }} | awk '{print $1}' | grep -v CONTAINER && sudo docker stop $(sudo docker ps --filter name=${{ env.CONTAINER_NAME }} | awk '{print $1}' | grep -v CONTAINER)
             sudo docker container ls -a | grep ${{ env.CONTAINER_NAME }} | awk '{print $1}' | grep -v CONTAINER && sudo docker rm $(sudo docker container ls -a | grep ${{ env.CONTAINER_NAME }} | awk '{print $1}' | grep -v CONTAINER)
             sudo docker run -d -p ${{ env.DOCKER_PORT }}:${{ env.DOCKER_PORT }} --name ${{ env.CONTAINER_NAME }} \
-            -e JASYPT_PW=${{ env.JASYPT_PW }} \
-            -e SERVER_PORT=${{ env.DOCKER_PORT }}
-            -e WEBCONFIG_IP=${{ env.WEBCONFIG_IP }} \
-            -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
-            -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+            -e JASYPT_PW=${{ env.JASYPT_PW }} \\
+            -e SERVER_PORT=${{ env.DOCKER_PORT }} \\
+            -e WEBCONFIG_IP=${{ env.WEBCONFIG_IP }} \\
+            -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \\
+            -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \\
             ${{ env.IMAGE_NAME }}
             sudo docker logout
             sudo docker ps --filter name=${{ env.CONTAINER_NAME }} && curl -X POST -H 'Content-Type: application/json' -d '{"chat_id": "-581532942", "text": "'"$TELE_SUCCESS_MSG"'", "disable_notification": true}' https://api.telegram.org/bot1815383460:AAHfQmatpaYPj2_XcGddiLj2TbgYViMV01g/sendMessage
