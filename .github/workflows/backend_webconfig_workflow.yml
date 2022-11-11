@@ -26,6 +26,7 @@ env:
   POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
   SIT_IP: 54.151.193.180
   SIT_USER: ec2-user
+  POSTGRES_IP: 54.151.193.180
 jobs:
   test:
     if: |
@@ -47,7 +48,8 @@ jobs:
         mvn -DJASYPT_PW=$JASYPT_PW 
         -DSERVER_PORT=${{ env.DOCKER_PORT }} 
         -DPOSTGRES_USERNAME=${{ env.POSTGRES_USERNAME }} 
-        -DPOSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }} clean install # need to pass in the argument here during the build to ensure it works
+        -DPOSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }} 
+        -DPOSTGRES_IP=${{ env.POSTGRES_IP }} clean install
 
     - name: Building docker image
       run: >
@@ -56,6 +58,7 @@ jobs:
         --build-arg SERVER_PORT=${{ env.DOCKER_PORT }} 
         --build-arg POSTGRES_USERNAME=${{ env.POSTGRES_USERNAME }}
         --build-arg POSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }}
+        --build-arg POSTGRES_IP=${{ env.POSTGRES_IP }}
   
   build:
     if: |
@@ -78,7 +81,8 @@ jobs:
         mvn -DJASYPT_PW=$JASYPT_PW 
         -DSERVER_PORT=${{ env.DOCKER_PORT }} 
         -DPOSTGRES_USERNAME=${{ env.POSTGRES_USERNAME }} 
-        -DPOSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }} clean install # need to pass in the argument here during the build to ensure it works
+        -DPOSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }} 
+        -DPOSTGRES_IP=${{ env.POSTGRES_IP }} clean install # need to pass in the argument here during the build to ensure it works
 
     - name: Building docker image
       run: >
@@ -87,6 +91,7 @@ jobs:
         --build-arg SERVER_PORT=${{ env.DOCKER_PORT }} 
         --build-arg POSTGRES_USERNAME=${{ env.POSTGRES_USERNAME }}
         --build-arg POSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }}
+        --build-arg POSTGRES_IP=${{ env.POSTGRES_IP }}
         
     - name: Docker login
       run: docker login -u $DOCKER_USERNAME -p $DOCKER_PAT 
