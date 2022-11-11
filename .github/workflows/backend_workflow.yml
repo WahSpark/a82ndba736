@@ -22,9 +22,9 @@ env:
   IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/spark-lean:${{ inputs.microservice_docker_tag }}
   CONTAINER_NAME: ${{ inputs.container_name }}
   DOCKER_PORT: ${{ inputs.server_port }}
-  SIT_IP: 52.221.213.98
+  SIT_IP: 54.151.193.180
   SIT_USER: ec2-user
-  WEBCONFIG_IP: 52.221.213.98
+  WEBCONFIG_IP: 54.151.193.180
 jobs:
   test:
     if: |
